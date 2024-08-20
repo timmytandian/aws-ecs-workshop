@@ -1,0 +1,41 @@
+# List the start up tasks. Learn more: https://www.gitpod.io/docs/configure/workspaces/tasks
+tasks:
+  - name: Dependencies setup
+    # "init" runs during prebuild => https://www.gitpod.io/docs/configure/projects/prebuilds
+    init: |
+      echo 'init script' 
+      sudo apt install -y jq
+      export AWS_CLI_AUTO_PROMPT="on-partial"
+      export AWS_REGION=$AWS_DEFAULT_REGION
+      
+      # Install copilot-cli
+      sudo curl -Lo /usr/local/bin/copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux && sudo chmod +x /usr/local/bin/copilot && copilot --help
+
+      # Install AWS session manager plugin for AWS CLI
+      curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+      sudo dpkg -i session-manager-plugin.deb
+      session-manager-plugin
+
+      # Make sure that the ELB and ECS service role exist (service role allows Amazon ELB/ECS to interact with other AWS services on our behalf).
+      aws iam get-role --role-name "AWSServiceRoleForElasticLoadBalancing" || aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com"
+      aws iam get-role --role-name "AWSServiceRoleForECS" || aws iam create-service-linked-role --aws-service-name "ecs.amazonaws.com"
+
+
+    command: | 
+      # clone the ECS Workshop service repos
+      mkdir ~/environment
+      cd ~/environment
+      git clone https://github.com/aws-containers/ecsdemo-platform
+      git clone https://github.com/aws-containers/ecsdemo-frontend
+      git clone https://github.com/aws-containers/ecsdemo-nodejs
+      git clone https://github.com/aws-containers/ecsdemo-crystal
+      cd $GITPOD_REPO_ROOT
+
+      
+
+# List the ports to expose. Learn more: https://www.gitpod.io/docs/configure/workspaces/ports
+#ports:
+#  - name: Frontend
+#    description: Port 3000 for the frontend
+#    port: 3000
+#    onOpen: open-preview
