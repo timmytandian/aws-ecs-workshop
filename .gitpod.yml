@@ -2,27 +2,29 @@
 tasks:
   - name: Dependencies setup
     # "init" runs during prebuild => https://www.gitpod.io/docs/configure/projects/prebuilds
+    # Things executed:
+    # 1) install jq
+    # 2) setup AWS-related env variable
+    # 3) install copilot
+    # 4) instal aws session manager plugin
+    # 5) make sure ELB and ECS service role exist
     init: |
       echo 'init script' 
       sudo apt install -y jq
       export AWS_CLI_AUTO_PROMPT="on-partial"
       export AWS_REGION=$AWS_DEFAULT_REGION
       
-      # Install copilot-cli
       sudo curl -Lo /usr/local/bin/copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux && sudo chmod +x /usr/local/bin/copilot && copilot --help
 
-      # Install AWS session manager plugin for AWS CLI
       curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
       sudo dpkg -i session-manager-plugin.deb
       session-manager-plugin
 
-      # Make sure that the ELB and ECS service role exist (service role allows Amazon ELB/ECS to interact with other AWS services on our behalf).
       aws iam get-role --role-name "AWSServiceRoleForElasticLoadBalancing" || aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com"
       aws iam get-role --role-name "AWSServiceRoleForECS" || aws iam create-service-linked-role --aws-service-name "ecs.amazonaws.com"
 
-
+    # clone the ECS Workshop service repos      
     command: | 
-      # clone the ECS Workshop service repos
       mkdir ~/environment
       cd ~/environment
       git clone https://github.com/aws-containers/ecsdemo-platform
