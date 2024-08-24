@@ -25,7 +25,8 @@ tasks:
       aws iam get-role --role-name "AWSServiceRoleForElasticLoadBalancing" --no-cli-pager || aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com"
       aws iam get-role --role-name "AWSServiceRoleForECS" --no-cli-pager || aws iam create-service-linked-role --aws-service-name "ecs.amazonaws.com"
 
-    # clone the ECS Workshop service repos      
+    # clone the ECS Workshop service repos
+    # alternative command: cp -r ~/environment $GITPOD_REPO_ROOT/      
     command: | 
       mkdir ~/environment
       cd ~/environment
