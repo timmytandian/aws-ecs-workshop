@@ -18,6 +18,7 @@ source:
     branch: main
     repository: https://github.com/timmytandian/aws-ecs-workshop
     # Optional: specify the name of an existing CodeStar Connections connection.
+    # blank line
     connection_name: copilot-timmy-aws-ecs-workshop
 
 # This section defines the order of the environments your pipeline will deploy to.
